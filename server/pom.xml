@@ -64,6 +64,18 @@
         </dependency>
 
         <dependency>
+            <groupId>com.vividsolutions</groupId>
+            <artifactId>jts</artifactId>
+            <version>${jts.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.dmitry.jooq.postgis.spatial</groupId>
+            <artifactId>jooq-postgis-spatial</artifactId>
+            <version>${jooq-postgis.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
@@ -179,6 +191,40 @@
                                     <includePrimaryKeys>false</includePrimaryKeys>
                                     <includeUniqueKeys>false</includeUniqueKeys>
                                     <includeForeignKeys>false</includeForeignKeys>
+                                    <customTypes>
+                                        <customType>
+                                            <name>Geometry</name>
+                                            <type>com.vividsolutions.jts.geom.Geometry</type>
+                                            <binding>org.jooq.postgis.spatial.JTSGeometryBinding</binding>
+                                        </customType>
+                                    </customTypes>
+                                    <forcedTypes>
+                                        <forcedType>
+                                            <userType>org.threeten.bp.LocalDateTime</userType>
+                                            <converter>
+                                                io.edanni.rndl.server.infrastructure.jooq.converter.LocalDateTimeConverter
+                                            </converter>
+                                            <types>timestamp\ without\ time\ zone</types>
+                                        </forcedType>
+                                        <forcedType>
+                                            <userType>org.threeten.bp.LocalTime</userType>
+                                            <converter>
+                                                io.edanni.rndl.server.infrastructure.jooq.converter.LocalTimeConverter
+                                            </converter>
+                                            <types>time\ without\ time\ zone</types>
+                                        </forcedType>
+                                        <forcedType>
+                                            <userType>org.threeten.bp.OffsetDateTime</userType>
+                                            <converter>
+                                                io.edanni.rndl.server.infrastructure.jooq.converter.OffsetDateTimeConverter
+                                            </converter>
+                                            <types>timestamp\ with\ time\ zone</types>
+                                        </forcedType>
+                                        <forcedType>
+                                            <name>Geometry</name>
+                                            <types>(geometry|GEOMETRY)</types>
+                                        </forcedType>
+                                    </forcedTypes>
                                 </database>
                                 <target>
                                     <packageName>io.edanni.rndl.jooq</packageName>

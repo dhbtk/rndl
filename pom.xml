@@ -29,6 +29,8 @@
         <kotlin.version>1.1.3-2</kotlin.version>
         <jooq.version>3.10.0</jooq.version>
         <threetenbp.version>1.3.6</threetenbp.version>
+        <jts.version>1.13</jts.version>
+        <jooq-postgis.version>1.0-SNAPSHOT</jooq-postgis.version>
     </properties>
 
     <repositories>
@@ -46,6 +48,14 @@
             <url>https://repo.spring.io/milestone</url>
             <snapshots>
                 <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>jooq-postgis-mvn-repo</id>
+            <url>https://raw.github.com/edanniehues/jooq-postgis-spatial/mvn-repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>
     </repositories>
