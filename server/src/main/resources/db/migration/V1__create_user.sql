@@ -1,10 +1,10 @@
 CREATE TABLE "user" (
-  id         bigserial PRIMARY KEY,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  email      varchar                  NOT NULL,
-  name       varchar                  NOT NULL,
-  password   varchar                  NOT NULL
+  id              bigserial PRIMARY KEY,
+  created_at      timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at      timestamp with time zone NOT NULL DEFAULT now(),
+  email           varchar                  NOT NULL,
+  full_name       varchar                  NOT NULL,
+  password_digest varchar                  NOT NULL
 );
 
 CREATE UNIQUE INDEX uk_user_email

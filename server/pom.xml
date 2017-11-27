@@ -21,6 +21,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
         </dependency>
@@ -73,6 +79,12 @@
             <groupId>net.dmitry.jooq.postgis.spatial</groupId>
             <artifactId>jooq-postgis-spatial</artifactId>
             <version>${jooq-postgis.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>${modelmapper.version}</version>
         </dependency>
 
         <dependency>
@@ -222,7 +234,7 @@
                                         </forcedType>
                                         <forcedType>
                                             <name>Geometry</name>
-                                            <types>(geometry|GEOMETRY)</types>
+                                            <types>(geometry|GEOMETRY|geography|GEOGRAPHY)</types>
                                         </forcedType>
                                     </forcedTypes>
                                 </database>
