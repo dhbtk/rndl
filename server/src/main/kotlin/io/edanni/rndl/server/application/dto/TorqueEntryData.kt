@@ -1,5 +1,11 @@
 package io.edanni.rndl.server.application.dto
 
+import com.vividsolutions.jts.geom.Coordinate
+import com.vividsolutions.jts.geom.GeometryFactory
+import com.vividsolutions.jts.geom.PrecisionModel
+import io.edanni.rndl.common.domain.entity.Entry
+import org.threeten.bp.Instant
+import org.threeten.bp.LocalDateTime
 import java.math.BigDecimal
 
 /**
@@ -12,8 +18,8 @@ class TorqueEntryData(
         time: Long? = null,
         kff1005: BigDecimal? = null,
         kff1006: BigDecimal? = null,
-        kff1001: Int? = null,
-        kc: Int? = null,
+        kff1001: BigDecimal? = null,
+        kc: BigDecimal? = null,
         kff1206: BigDecimal? = null,
         kd: Int? = null,
         k11: BigDecimal? = null,
@@ -28,8 +34,8 @@ class TorqueEntryData(
     val deviceTimestamp: Long?
     val longitude: BigDecimal?
     val latitude: BigDecimal?
-    val gpsSpeed: Int?
-    val rpm: Int?
+    val gpsSpeed: BigDecimal?
+    val rpm: BigDecimal?
     val economy: BigDecimal?
     val instantEconomy: BigDecimal?
     val speed: Int?
@@ -57,4 +63,23 @@ class TorqueEntryData(
         fuelFlow = kff125a
         fuelUsed = kff1271
     }
+
+    fun toEntry(tripId: Long) = Entry(
+            tripId = tripId,
+            deviceTime = LocalDateTime.from(Instant.ofEpochSecond(deviceTimestamp!!)),
+            coordinates = if (longitude != null && latitude != null) {
+                GeometryFactory(PrecisionModel(), 4326).createPoint(Coordinate(longitude.toDouble(), latitude.toDouble()))
+            } else {
+                null
+            },
+            gpsSpeed = gpsSpeed,
+            gpsAltitude = null,
+            rpm = rpm,
+            economy = economy,
+            speed = speed,
+            throttle = throttle,
+            instantEconomy = instantEconomy,
+            fuelFlow = fuelFlow,
+            fuelUsed = fuelUsed
+    )
 }

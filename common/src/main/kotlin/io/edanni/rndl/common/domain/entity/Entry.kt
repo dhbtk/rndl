@@ -6,6 +6,7 @@ import org.threeten.bp.OffsetDateTime
 import java.math.BigDecimal
 
 data class Entry(
+        // Database
         override val id: Long? = null,
         override val createdAt: OffsetDateTime? = null,
         override val updatedAt: OffsetDateTime? = null,
@@ -20,5 +21,7 @@ data class Entry(
         val throttle: BigDecimal? = null,
         val instantEconomy: BigDecimal? = null,
         val fuelFlow: BigDecimal? = null,
-        val fuelUsed: BigDecimal? = null
+        val fuelUsed: BigDecimal? = null,
+        // Entity
+        val trip: Trip? = null
 ) : Entity
