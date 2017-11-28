@@ -40,10 +40,6 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
         <dependency>
@@ -197,7 +193,7 @@
                             <generator>
                                 <database>
                                     <includes>.*</includes>
-                                    <excludes>^(schema_version|spatial_ref_sys|_|st_|St_|ST_|sT_)</excludes>
+                                    <excludes>^(schema_version|spatial_ref_sys|_.*|st_.*|St_.*|ST_.*|sT_.*)</excludes>
                                     <inputSchema>public</inputSchema>
                                     <includeSequences>false</includeSequences>
                                     <includePrimaryKeys>false</includePrimaryKeys>
@@ -207,7 +203,8 @@
                                         <customType>
                                             <name>Geometry</name>
                                             <type>com.vividsolutions.jts.geom.Geometry</type>
-                                            <binding>org.jooq.postgis.spatial.JTSGeometryBinding</binding>
+                                            <binding>net.dmitry.jooq.postgis.spatial.binding.JTSGeometryBinding
+                                            </binding>
                                         </customType>
                                     </customTypes>
                                     <forcedTypes>
