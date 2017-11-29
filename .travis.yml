@@ -1,5 +1,5 @@
 language: java
-script: ./mvnw verify
+script: mvn verify
 services:
   - postgresql
 before_install:
