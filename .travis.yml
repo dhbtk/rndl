@@ -6,4 +6,7 @@ before_install:
   - psql -c 'create database rndl owner rndl;' -U postgres
   - psql -c 'create database "rndl-test" owner rndl;' -U postgres
 addons:
-  postgresql: '9.6'
+  postgresql: '9.5'
+  apt:
+    packages:
+      - postgresql-9.5-postgis-2.3
