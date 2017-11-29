@@ -6,6 +6,7 @@ import com.vividsolutions.jts.geom.PrecisionModel
 import io.edanni.rndl.common.domain.entity.Entry
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalDateTime
+import org.threeten.bp.ZoneId
 import java.math.BigDecimal
 
 /**
@@ -21,7 +22,7 @@ class TorqueEntryData(
         kff1001: BigDecimal? = null,
         kc: BigDecimal? = null,
         kff1206: BigDecimal? = null,
-        kd: Int? = null,
+        kd: BigDecimal? = null,
         k11: BigDecimal? = null,
         kff1203: BigDecimal? = null,
         kff125a: BigDecimal? = null,
@@ -57,7 +58,7 @@ class TorqueEntryData(
         gpsSpeed = kff1001
         rpm = kc
         economy = kff1206
-        speed = kd
+        speed = kd?.intValueExact()
         throttle = k11
         instantEconomy = kff1203
         fuelFlow = kff125a
@@ -66,7 +67,7 @@ class TorqueEntryData(
 
     fun toEntry(tripId: Long) = Entry(
             tripId = tripId,
-            deviceTime = LocalDateTime.from(Instant.ofEpochSecond(deviceTimestamp!!)),
+            deviceTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(deviceTimestamp!!), ZoneId.systemDefault()),
             coordinates = if (longitude != null && latitude != null) {
                 GeometryFactory(PrecisionModel(), 4326).createPoint(Coordinate(longitude.toDouble(), latitude.toDouble()))
             } else {

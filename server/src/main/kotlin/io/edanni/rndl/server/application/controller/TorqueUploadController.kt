@@ -1,6 +1,5 @@
 package io.edanni.rndl.server.application.controller
 
-import io.edanni.rndl.common.domain.entity.Vehicle
 import io.edanni.rndl.server.application.dto.TorqueEntryData
 import io.edanni.rndl.server.domain.service.EntryService
 import org.springframework.web.bind.annotation.GetMapping
@@ -13,7 +12,8 @@ import reactor.core.publisher.Mono
 class TorqueUploadController(private val entryService: EntryService) {
 
     @GetMapping
-    fun upload(data: TorqueEntryData): Mono<Vehicle?> {
-        return entryService.loadVehicle(data.torqueId)
+    fun upload(data: TorqueEntryData): Mono<String> {
+        entryService.insertEntry(data)
+        return Mono.just("OK!")
     }
 }
