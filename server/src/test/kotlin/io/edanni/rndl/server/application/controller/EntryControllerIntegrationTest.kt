@@ -14,7 +14,7 @@ import java.io.FileOutputStream
 import java.util.logging.Logger
 import java.util.zip.ZipFile
 
-@Sql("/dataset/ingestion-test.sql")
+@Sql("/dataset/entry-controller/ingestion-test.sql")
 class EntryControllerIntegrationTest : ServerApplicationTests() {
     val client: WebClient = WebClient.create()
     val log = Logger.getLogger(this::class.java.name)
@@ -23,7 +23,7 @@ class EntryControllerIntegrationTest : ServerApplicationTests() {
     lateinit var objectMapper: ObjectMapper
 
     @Test
-    fun testDataIngestion() {
+    fun `ingestion of real data`() {
         val tempZipFile = File.createTempFile("requests", "zip")
         tempZipFile.deleteOnExit()
         javaClass.getResourceAsStream("/requests.zip").use { input ->
