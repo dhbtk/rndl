@@ -60,7 +60,7 @@
             <url>https://raw.github.com/edanniehues/jooq-postgis-spatial/mvn-repo/</url>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
+                <!--<updatePolicy>always</updatePolicy>-->
             </snapshots>
         </repository>
     </repositories>

@@ -217,7 +217,9 @@
                             <generator>
                                 <database>
                                     <includes>.*</includes>
-                                    <excludes>^(schema_version|spatial_ref_sys|_.*|st_.*|St_.*|ST_.*|sT_.*)</excludes>
+                                    <excludes>
+                                        ^(schema_version|spatial_ref_sys|_.*|st_(approx|quantile|histogram|value|pixel|dump).*)
+                                    </excludes>
                                     <inputSchema>public</inputSchema>
                                     <includeSequences>false</includeSequences>
                                     <includePrimaryKeys>false</includePrimaryKeys>

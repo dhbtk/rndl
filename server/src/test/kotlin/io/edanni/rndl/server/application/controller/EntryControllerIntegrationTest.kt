@@ -43,12 +43,8 @@ class EntryControllerIntegrationTest : ServerApplicationTests() {
         entries.forEach { entry ->
             val request = client.get().uri("http://localhost:8081/api/upload?" +
                     entry.map { (k, v) -> "$k=$v" }.reduce { a, c -> "$a&$c" })
-            val pair = request.exchange().flatMap { response ->
-                response.bodyToMono<String>().map { body ->
-                    Pair(response, body)
-                }
-            }.toFuture().get()
-            val (response, body) = pair
+            val response = request.exchange().block()!!
+            val body = response.bodyToMono<String>().block()!!
             assertEquals(200, response.statusCode().value())
             assertEquals("OK!", body)
         }
