@@ -2,7 +2,7 @@ package io.edanni.rndl.server.domain.repository
 
 import io.edanni.rndl.common.domain.entity.Entry
 import io.edanni.rndl.jooq.Tables.ENTRY
-import io.edanni.rndl.server.infrastructure.mapping.beanToData
+import io.edanni.rndl.server.infrastructure.mapping.recordToData
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
 
@@ -19,7 +19,7 @@ class EntryRepository(private val create: DSLContext) {
                         e.speed, e.throttle, e.instantEconomy, e.fuelFlow, e.fuelUsed)
                 .returning()
                 .fetchOptional()
-                .map { beanToData<Entry>(it, Entry::class) }
+                .map { recordToData<Entry>(it, Entry::class) }
                 .get()
     }
 }

@@ -6,7 +6,7 @@ import io.edanni.rndl.jooq.tables.Entry.ENTRY
 import io.edanni.rndl.jooq.tables.Trip.TRIP
 import io.edanni.rndl.jooq.tables.Vehicle.VEHICLE
 import io.edanni.rndl.jooq.tables.records.VehicleRecord
-import io.edanni.rndl.server.infrastructure.mapping.beanToData
+import io.edanni.rndl.server.infrastructure.mapping.recordToData
 import io.edanni.rndl.server.infrastructure.pagination.Page
 import io.edanni.rndl.server.infrastructure.pagination.PageRequest
 import io.edanni.rndl.server.infrastructure.repository.RecordNotFoundException
@@ -28,10 +28,10 @@ class VehicleRepository(private val create: DSLContext) {
 
         val vehicles = if (page.page != null) {
             val result = where(create.selectFrom(VEHICLE)).orderBy(VEHICLE.NAME).limit(page.size).offset(page.size * page.page)
-                    .fetch { beanToData(it as VehicleRecord, Vehicle::class) }
+                    .fetch { recordToData(it as VehicleRecord, Vehicle::class) }
             Page(count, page.page, result.size, count / page.size, result)
         } else {
-            val result = where(create.selectFrom(VEHICLE)).orderBy(VEHICLE.NAME).fetch { beanToData(it as VehicleRecord, Vehicle::class) }
+            val result = where(create.selectFrom(VEHICLE)).orderBy(VEHICLE.NAME).fetch { recordToData(it as VehicleRecord, Vehicle::class) }
             Page(count, 0, count, 1, result)
         }
 
@@ -43,7 +43,7 @@ class VehicleRepository(private val create: DSLContext) {
                 .where(VEHICLE.ID.`in`(ids))
                 .fetch { record ->
                     val entryRecord = record.into(ENTRY)
-                    entryRecord.id to beanToData(entryRecord, Entry::class)
+                    entryRecord.id to recordToData(entryRecord, Entry::class)
                 }.toMap()
 
         return vehicles.copy(content = vehicles.content.map { it.copy(latestEntry = entries[it.id]) })
@@ -53,7 +53,7 @@ class VehicleRepository(private val create: DSLContext) {
         return create.selectFrom(VEHICLE)
                 .where(VEHICLE.ID.eq(id))
                 .fetchOptional()
-                .map { beanToData(it, Vehicle::class) }
+                .map { recordToData(it, Vehicle::class) }
                 .orElseThrow { RecordNotFoundException(Vehicle::class, id) }
     }
 

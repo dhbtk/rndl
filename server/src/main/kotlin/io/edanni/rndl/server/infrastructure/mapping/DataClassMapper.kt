@@ -8,9 +8,9 @@ import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.javaType
 
 /**
- * Turns a java bean into a Kotlin data class.
+ * Turns a JOOQ Record into a Kotlin data class.
  */
-fun <T : Any> beanToData(source: TableRecord<*>, dest: KClass<T>): T {
+fun <T : Any> recordToData(source: TableRecord<*>, dest: KClass<T>): T {
     val parameters = dest.primaryConstructor!!.parameters
     val parametersMap = HashMap<KParameter, Any>()
     val sourceProperties = Introspector.getBeanInfo(source.javaClass).propertyDescriptors
