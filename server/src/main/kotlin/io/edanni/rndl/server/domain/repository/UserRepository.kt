@@ -40,7 +40,7 @@ class UserRepository(private val create: DSLContext) : ReactiveUserDetailsServic
                     .where(USER_TOKEN.TOKEN.eq(token))
                     .and(USER_TOKEN.EXPIRES_AT.gt(OffsetDateTime.now()))
                     .fetchOptional()
-                    .map { beanToData(it, User::class) as UserDetails }
+                    .map { beanToData(it.into(USER), User::class) as UserDetails }
                     .orElse(null)
         }.filter { it != null }
     }

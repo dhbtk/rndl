@@ -3,15 +3,14 @@ package io.edanni.rndl.server.infrastructure.jwt
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.edanni.rndl.common.domain.entity.User
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
+import io.edanni.rndl.server.application.settings.ApplicationSettings
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextImpl
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.web.server.ServerAuthenticationEntryPoint
 import org.springframework.security.web.server.WebFilterExchange
 import org.springframework.security.web.server.authentication.ServerAuthenticationFailureHandler
@@ -27,11 +26,10 @@ import java.util.*
 
 @Component
 class JwtTokenSecurityProvider
-@Autowired
 constructor(
         private val jwtUserRepository: JwtUserRepository,
         private val jwtTokenRepository: JwtTokenRepository,
-        @Value("\${application.jwt-secret}") jwtSecret: String,
+        settings: ApplicationSettings,
         private val objectMapper: ObjectMapper
 ) :
         ServerAuthenticationSuccessHandler,
@@ -42,12 +40,12 @@ constructor(
         ServerAuthenticationEntryPoint {
 
     companion object {
-
         private val AUTHORIZATION_HEADER = "Authorization"
         private val AUTHORIZATION_TYPE = "Bearer"
     }
 
-    private val algorithm = Algorithm.HMAC512(jwtSecret)
+    private val algorithm = Algorithm.HMAC512(settings.jwtSecret)
+
     /**
      * Generates a 401 Unauthorized for non-authenticated responses
      */
@@ -91,9 +89,9 @@ constructor(
     /**
      * Sends a 204 No Content response code after deleting the token.
      */
-    override fun onLogoutSuccess(exchange: WebFilterExchange?, authentication: Authentication?): Mono<Void> {
+    override fun onLogoutSuccess(exchange: WebFilterExchange, authentication: Authentication?): Mono<Void> {
         return Mono.fromCallable {
-            exchange!!.exchange.response.statusCode = HttpStatus.NO_CONTENT
+            exchange.exchange.response.statusCode = HttpStatus.NO_CONTENT
             null
         }
     }
@@ -102,7 +100,7 @@ constructor(
      * Logs out the user by deleting his token from the database.
      */
     override fun logout(exchange: WebFilterExchange?, authentication: Authentication?): Mono<Void> {
-        return extractTokenFromExchange(exchange?.exchange)
+        return extractTokenFromExchange(exchange!!.exchange)
                 .flatMap { jwtTokenRepository.deleteUserTokenByToken(it) }
     }
 
@@ -110,7 +108,7 @@ constructor(
      * Creates a token and saves it to the database.
      */
     override fun onAuthenticationSuccess(webFilterExchange: WebFilterExchange?, authentication: Authentication?): Mono<Void> {
-        return Mono.justOrEmpty(authentication?.principal as User)
+        return Mono.justOrEmpty(authentication?.principal as UserDetails)
                 .map { Pair(it, OffsetDateTime.now().plusMonths(6)) }
                 .map { (user, expiration) ->
                     Triple(user, expiration, JWT.create().withSubject(user.username).withExpiresAt(Date(expiration.toInstant().toEpochMilli())).sign(algorithm))
@@ -120,7 +118,7 @@ constructor(
                 }
                 .flatMap { (_, expiration, token) ->
                     val output = HashMap<String, String>()
-                    output["expires_at"] = (expiration.toInstant().epochSecond - OffsetDateTime.now().toInstant().epochSecond).toString()
+                    output["expires_in"] = (expiration.toInstant().epochSecond - OffsetDateTime.now().toInstant().epochSecond).toString()
                     output["access_token"] = token
                     val factory = webFilterExchange!!.exchange.response.bufferFactory()
                     webFilterExchange.exchange.response.statusCode = HttpStatus.CREATED
