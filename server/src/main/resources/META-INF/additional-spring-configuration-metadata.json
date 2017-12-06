@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "rndl.jwt-secret",
+      "type": "java.lang.String",
+      "description": "Seed secret for JWT generation."
+    }
+  ]
+}

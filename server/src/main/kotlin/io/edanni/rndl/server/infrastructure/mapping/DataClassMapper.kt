@@ -1,5 +1,6 @@
 package io.edanni.rndl.server.infrastructure.mapping
 
+import org.jooq.TableRecord
 import java.beans.Introspector
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
@@ -9,7 +10,7 @@ import kotlin.reflect.jvm.javaType
 /**
  * Turns a java bean into a Kotlin data class.
  */
-fun <T : Any> beanToData(source: Any, dest: KClass<T>): T {
+fun <T : Any> beanToData(source: TableRecord<*>, dest: KClass<T>): T {
     val parameters = dest.primaryConstructor!!.parameters
     val parametersMap = HashMap<KParameter, Any>()
     val sourceProperties = Introspector.getBeanInfo(source.javaClass).propertyDescriptors
