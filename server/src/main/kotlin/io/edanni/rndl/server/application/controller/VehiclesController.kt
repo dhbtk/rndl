@@ -9,15 +9,14 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toMono
 
 @RestController
 @RequestMapping("/api/vehicles")
 class VehiclesController(private val vehicleService: VehicleService) {
 
     @GetMapping
-    fun index(filter: String?, pageRequest: PageRequest): Mono<Page<Vehicle>> = vehicleService.findAllWithLatestEntry(filter, pageRequest).toMono()
+    fun index(filter: String?, pageRequest: PageRequest): Mono<Page<Vehicle>> = Mono.fromCallable { vehicleService.findAllWithLatestEntry(filter, pageRequest) }
 
     @GetMapping("/{id}")
-    fun show(@PathVariable("id") id: Long?): Mono<Vehicle> = vehicleService.findById(id!!).toMono()
+    fun show(@PathVariable("id") id: Long?): Mono<Vehicle> = Mono.fromCallable { vehicleService.findById(id!!) }
 }

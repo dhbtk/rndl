@@ -37,10 +37,14 @@ class VehicleRepository(private val create: DSLContext) {
 
         val ids = vehicles.content.map { it.id!! }
 
+        val t = TRIP.`as`("t")
+
         val entries = create.select().from(ENTRY)
                 .join(TRIP).onKey()
-                .join(VEHICLE).onKey()
-                .where(VEHICLE.ID.`in`(ids))
+                .where(TRIP.VEHICLE_ID.`in`(ids))
+                .and(ENTRY.ID.eq(create.select(ENTRY.ID)
+                        .from(ENTRY).join(t).onKey()
+                        .where(t.VEHICLE_ID.eq(TRIP.VEHICLE_ID)).and(ENTRY.COORDINATES.isNotNull).orderBy(ENTRY.DEVICE_TIME.desc()).limit(1)))
                 .fetch { record ->
                     val entryRecord = record.into(ENTRY)
                     entryRecord.id to recordToData(entryRecord, Entry::class)
@@ -50,10 +54,16 @@ class VehicleRepository(private val create: DSLContext) {
     }
 
     fun findById(id: Long): Vehicle {
-        return create.selectFrom(VEHICLE)
+        return create.select()
+                .from(VEHICLE)
+                .leftJoin(TRIP).onKey()
+                .leftJoin(ENTRY).on(ENTRY.ID.eq(
+                create.select(ENTRY.ID)
+                        .from(ENTRY).join(TRIP).onKey()
+                        .where(TRIP.VEHICLE_ID.eq(VEHICLE.ID)).and(ENTRY.COORDINATES.isNotNull).orderBy(ENTRY.DEVICE_TIME.desc()).limit(1)))
                 .where(VEHICLE.ID.eq(id))
                 .fetchOptional()
-                .map { recordToData(it, Vehicle::class) }
+                .map { recordToData(it.into(VEHICLE), Vehicle::class).copy(latestEntry = recordToData(it.into(ENTRY), Entry::class)) }
                 .orElseThrow { RecordNotFoundException(Vehicle::class, id) }
     }
 
