@@ -1,10 +1,9 @@
 package io.edanni.rndl.server.domain.repository
 
-import io.edanni.rndl.jooq.Routines
 import io.edanni.rndl.jooq.tables.Entry.ENTRY
 import io.edanni.rndl.jooq.tables.Trip.TRIP
 import org.jooq.DSLContext
-import org.jooq.util.postgres.PostgresDataType
+import org.jooq.impl.DSL
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
 import org.threeten.bp.LocalTime
@@ -54,16 +53,11 @@ class TripRepository(private val create: DSLContext, private val jdbcTemplate: J
                         c.select(e.DEVICE_TIME.max().minus(e.DEVICE_TIME.min()).cast(LocalTime::class.java))
                                 .from(ENTRY)
                                 .where(e.TRIP_ID.eq(t.ID)))
-                .set(t.DISTANCE, c.select(
-                        Routines.stLength1(
-                                Routines.stGeogfromtext(
-                                        Routines.stMakeline3(e.COORDINATES).cast(PostgresDataType.TEXT)
-                                )
-                        ))
-                        .from(ENTRY)
+                .set(t.DISTANCE, c.select(DSL.field("st_length(st_makeline(coordinates::geometry)::geography)").cast(Double::class.java))
+                        .from(c.select(e.COORDINATES).from(ENTRY)
                         .where(e.TRIP_ID.eq(t.ID))
                         .and(e.COORDINATES.isNotNull)
-                        .orderBy(e.DEVICE_TIME))
+                                .orderBy(e.DEVICE_TIME)))
                 .set(t.UPDATED_AT, OffsetDateTime.now())
                 .where(t.ID.`in`(
                         c.select(t.ID)
