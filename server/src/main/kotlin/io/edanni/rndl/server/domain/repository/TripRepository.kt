@@ -1,17 +1,41 @@
 package io.edanni.rndl.server.domain.repository
 
+import io.edanni.rndl.common.domain.entity.Trip
+import io.edanni.rndl.common.domain.entity.Vehicle
 import io.edanni.rndl.jooq.tables.Entry.ENTRY
 import io.edanni.rndl.jooq.tables.Trip.TRIP
+import io.edanni.rndl.jooq.tables.Vehicle.VEHICLE
+import io.edanni.rndl.server.infrastructure.mapping.recordToData
 import org.jooq.DSLContext
+import org.jooq.DatePart
+import org.jooq.Field
 import org.jooq.impl.DSL
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 import org.threeten.bp.LocalTime
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.temporal.TemporalAdjusters
 import java.math.BigDecimal
 
 @Repository
 class TripRepository(private val create: DSLContext, private val jdbcTemplate: JdbcTemplate) {
+
+    fun listTripsByMonthAndVehicleId(year: Int, month: Int, vehicleId: Long?): List<Trip> {
+        val monthStart = LocalDate.of(year, month, 1).with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay()
+        val monthEnd = LocalDate.of(year, month, 1).with(TemporalAdjusters.lastDayOfMonth()).atTime(23, 59, 59)
+        val tripStart = DSL.field("to_timestamp(start_timestamp / 1000)") as Field<LocalDateTime>
+        val trips = create.selectFrom(TRIP)
+                .where(TRIP.VEHICLE_ID.eq(vehicleId).or("?::bigint is null", vehicleId))
+                .and(tripStart.between(monthStart, monthEnd))
+                .orderBy(DSL.extract(tripStart, DatePart.DAY).desc(), TRIP.CREATED_AT)
+                .fetch { recordToData(it, Trip::class) }
+        val vehicles = create.selectFrom(VEHICLE)
+                .where(VEHICLE.ID.`in`(trips.map { it.vehicleId }.distinct()))
+                .fetch { recordToData(it, Vehicle::class) }
+        return trips.map { it.copy(vehicle = vehicles.find { v -> v.id == it.vehicleId }) }
+    }
 
     fun findOrCreateTripIdByVehicleIdAndTimestamp(vehicleId: Long, timestamp: Long): Long {
         jdbcTemplate.execute("LOCK trip IN ACCESS EXCLUSIVE MODE")

@@ -1,7 +1,6 @@
 package io.edanni.rndl.common.domain.entity
 
-import org.threeten.bp.LocalTime
-import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.*
 import java.math.BigDecimal
 
 data class Trip(
@@ -20,4 +19,10 @@ data class Trip(
         // Entity
         val vehicle: Vehicle? = null,
         val entries: List<Entry> = emptyList()
-) : Entity
+) : Entity {
+    val startTime: LocalDateTime? = if (startTimestamp != null) {
+        LocalDateTime.ofInstant(Instant.ofEpochMilli(startTimestamp), ZoneId.systemDefault())
+    } else {
+        null
+    }
+}
