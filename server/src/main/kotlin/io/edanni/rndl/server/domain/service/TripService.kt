@@ -10,4 +10,6 @@ class TripService(private val tripRepository: TripRepository) {
     //
 
     fun listTripsByMonthAndVehicleId(year: Int, month: Int, vehicleId: Long?) = tripRepository.listTripsByMonthAndVehicleId(year, month, vehicleId)
+
+    fun findById(id: Long) = tripRepository.findById(id)
 }

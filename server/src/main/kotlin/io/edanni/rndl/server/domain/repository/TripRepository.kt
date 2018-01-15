@@ -1,11 +1,13 @@
 package io.edanni.rndl.server.domain.repository
 
+import io.edanni.rndl.common.domain.entity.Entry
 import io.edanni.rndl.common.domain.entity.Trip
 import io.edanni.rndl.common.domain.entity.Vehicle
 import io.edanni.rndl.jooq.tables.Entry.ENTRY
 import io.edanni.rndl.jooq.tables.Trip.TRIP
 import io.edanni.rndl.jooq.tables.Vehicle.VEHICLE
 import io.edanni.rndl.server.infrastructure.mapping.recordToData
+import io.edanni.rndl.server.infrastructure.repository.RecordNotFoundException
 import org.jooq.DSLContext
 import org.jooq.DatePart
 import org.jooq.Field
@@ -35,6 +37,19 @@ class TripRepository(private val create: DSLContext, private val jdbcTemplate: J
                 .where(VEHICLE.ID.`in`(trips.map { it.vehicleId }.distinct()))
                 .fetch { recordToData(it, Vehicle::class) }
         return trips.map { it.copy(vehicle = vehicles.find { v -> v.id == it.vehicleId }) }
+    }
+
+    fun findById(id: Long): Trip {
+        val entries = create.selectFrom(ENTRY)
+                .where(ENTRY.TRIP_ID.eq(id))
+                .orderBy(ENTRY.DEVICE_TIME)
+                .fetch { recordToData(it, Entry::class) }
+        return create.selectFrom(TRIP)
+                .where(TRIP.ID.eq(id))
+                .fetchOptional()
+                .map { recordToData(it, Trip::class) }
+                .map { it.copy(entries = entries) }
+                .orElseThrow { RecordNotFoundException(Trip::class, id) }
     }
 
     fun findOrCreateTripIdByVehicleIdAndTimestamp(vehicleId: Long, timestamp: Long): Long {
