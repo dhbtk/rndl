@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.threeten.bp.LocalDateTime
 import reactor.core.publisher.Mono
 
 @RestController
@@ -13,7 +14,7 @@ import reactor.core.publisher.Mono
 class TripsController(private val tripService: TripService) {
 
     @GetMapping
-    fun index(year: Int, month: Int, vehicleId: Long?): Mono<List<Trip>> = Mono.fromCallable { tripService.listTripsByMonthAndVehicleId(year, month, vehicleId) }
+    fun index(year: Int = LocalDateTime.now().year, month: Int = LocalDateTime.now().monthValue, vehicleId: Long?): Mono<List<Trip>> = Mono.fromCallable { tripService.listTripsByMonthAndVehicleId(year, month, vehicleId) }
 
     @GetMapping("/{id}")
     fun show(@PathVariable("id") id: Long): Mono<Trip> = Mono.fromCallable { tripService.findById(id) }
