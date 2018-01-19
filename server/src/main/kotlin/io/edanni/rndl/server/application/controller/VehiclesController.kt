@@ -17,9 +17,11 @@ class VehiclesController(private val vehicleService: VehicleService) {
 
     @GetMapping
     fun index(filter: String?, pageRequest: PageRequest): Mono<Page<Vehicle>> {
-        return Mono.fromCallable { vehicleService.findAllWithLatestEntry(filter, pageRequest, currentUser()) }
+        return currentUser().map { user ->
+            vehicleService.findAllWithLatestEntry(filter, pageRequest, user)
+        }
     }
 
     @GetMapping("/{id}")
-    fun show(@PathVariable("id") id: Long?): Mono<Vehicle> = Mono.fromCallable { vehicleService.findById(id!!, currentUser()) }
+    fun show(@PathVariable("id") id: Long?): Mono<Vehicle> = currentUser().map { vehicleService.findById(id!!, it) }
 }

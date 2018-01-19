@@ -10,5 +10,5 @@ import org.springframework.test.context.junit4.SpringRunner
 @ActiveProfiles("test")
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = DEFINED_PORT)
-@ComponentScan(basePackageClasses = arrayOf(ServerApplication::class))
+@ComponentScan(basePackageClasses = [(ServerApplication::class)])
 abstract class ServerApplicationTests

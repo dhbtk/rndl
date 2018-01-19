@@ -11,7 +11,6 @@ import reactor.core.publisher.toMono
 @RestController
 @RequestMapping("/api/upload")
 class TorqueUploadController(private val entryService: EntryService) {
-
     @GetMapping
     fun upload(data: TorqueEntryData): Mono<String> {
         entryService.insertEntry(data)

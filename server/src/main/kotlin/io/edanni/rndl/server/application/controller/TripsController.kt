@@ -16,9 +16,9 @@ class TripsController(private val tripService: TripService) {
 
     @GetMapping
     fun index(year: Int = LocalDateTime.now().year, month: Int = LocalDateTime.now().monthValue, vehicleId: Long?): Mono<List<Trip>> {
-        return Mono.fromCallable { tripService.listTripsFiltered(year, month, currentUser(), vehicleId) }
+        return currentUser().map { tripService.listTripsFiltered(year, month, it, vehicleId) }
     }
 
     @GetMapping("/{id}")
-    fun show(@PathVariable("id") id: Long): Mono<Trip> = Mono.fromCallable { tripService.findByIdAndUser(id, currentUser()) }
+    fun show(@PathVariable("id") id: Long): Mono<Trip> = currentUser().map { tripService.findByIdAndUser(id, it) }
 }
