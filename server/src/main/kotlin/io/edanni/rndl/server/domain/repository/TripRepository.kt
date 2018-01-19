@@ -1,10 +1,10 @@
 package io.edanni.rndl.server.domain.repository
 
-import io.edanni.rndl.common.domain.entity.Entry
-import io.edanni.rndl.common.domain.entity.Trip
-import io.edanni.rndl.common.domain.entity.Vehicle
+import io.edanni.rndl.common.domain.entity.*
 import io.edanni.rndl.jooq.tables.Entry.ENTRY
 import io.edanni.rndl.jooq.tables.Trip.TRIP
+import io.edanni.rndl.jooq.tables.UserGroup.USER_GROUP
+import io.edanni.rndl.jooq.tables.UserGroupMembership.USER_GROUP_MEMBERSHIP
 import io.edanni.rndl.jooq.tables.Vehicle.VEHICLE
 import io.edanni.rndl.server.infrastructure.mapping.recordToData
 import io.edanni.rndl.server.infrastructure.repository.RecordNotFoundException
@@ -24,30 +24,44 @@ import java.math.BigDecimal
 @Repository
 class TripRepository(private val create: DSLContext, private val jdbcTemplate: JdbcTemplate) {
 
-    fun listTripsByMonthAndVehicleId(year: Int, month: Int, vehicleId: Long?): List<Trip> {
+    fun listTripsFiltered(year: Int, month: Int, user: User, vehicleId: Long?): List<Trip> {
         val monthStart = LocalDate.of(year, month, 1).with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay()
         val monthEnd = LocalDate.of(year, month, 1).with(TemporalAdjusters.lastDayOfMonth()).atTime(23, 59, 59)
         val tripStart = DSL.field("to_timestamp(start_timestamp / 1000)") as Field<LocalDateTime>
-        val trips = create.selectFrom(TRIP)
+        return create.select().from(TRIP)
+                .innerJoin(VEHICLE).onKey()
+                .innerJoin(USER_GROUP).onKey()
+                .innerJoin(USER_GROUP_MEMBERSHIP).onKey()
                 .where(TRIP.VEHICLE_ID.eq(vehicleId).or("?::bigint is null", vehicleId))
                 .and(tripStart.between(monthStart, monthEnd))
+                .and(USER_GROUP_MEMBERSHIP.USER_ID.eq(user.id))
                 .orderBy(DSL.extract(tripStart, DatePart.DAY).desc(), TRIP.CREATED_AT)
-                .fetch { recordToData(it, Trip::class) }
-        val vehicles = create.selectFrom(VEHICLE)
-                .where(VEHICLE.ID.`in`(trips.map { it.vehicleId }.distinct()))
-                .fetch { recordToData(it, Vehicle::class) }
-        return trips.map { it.copy(vehicle = vehicles.find { v -> v.id == it.vehicleId }) }
+                .fetch {
+                    recordToData(it.into(TRIP), Trip::class).copy(
+                            vehicle = recordToData(it.into(VEHICLE), Vehicle::class).copy(
+                                    userGroup = recordToData(it.into(USER_GROUP), UserGroup::class)))
+                }
     }
 
-    fun findById(id: Long): Trip {
+    fun findByIdAndUser(id: Long, user: User): Trip {
         val entries = create.selectFrom(ENTRY)
                 .where(ENTRY.TRIP_ID.eq(id))
                 .orderBy(ENTRY.DEVICE_TIME)
                 .fetch { recordToData(it, Entry::class) }
-        return create.selectFrom(TRIP)
+        return create.select().from(TRIP)
+                .innerJoin(VEHICLE).onKey()
+                .innerJoin(USER_GROUP).onKey()
+                .innerJoin(USER_GROUP_MEMBERSHIP).onKey()
                 .where(TRIP.ID.eq(id))
+                .and(USER_GROUP_MEMBERSHIP.USER_ID.eq(user.id))
                 .fetchOptional()
-                .map { recordToData(it, Trip::class) }
+                .map {
+                    recordToData(it.into(TRIP), Trip::class).copy(
+                            vehicle = recordToData(it.into(VEHICLE), Vehicle::class).copy(
+                                    userGroup = recordToData(it.into(USER_GROUP), UserGroup::class)
+                            )
+                    )
+                }
                 .map { it.copy(entries = entries) }
                 .orElseThrow { RecordNotFoundException(Trip::class, id) }
     }

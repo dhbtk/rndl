@@ -11,7 +11,8 @@ data class User constructor(
         override val updatedAt: OffsetDateTime? = null,
         val email: String? = null,
         val fullName: String? = null,
-        @JsonIgnore val passwordDigest: String? = null
+        @JsonIgnore val passwordDigest: String? = null,
+        val userGroupMemberships: List<UserGroupMembership> = emptyList()
 ) : Entity, UserDetails {
 
     @JsonIgnore
