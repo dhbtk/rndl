@@ -1,5 +1,5 @@
 import Entity from '../Entity';
-import User from './';
+import User from './User';
 import UserGroupMembership from './UserGroupMembership';
 
 export default interface UserGroup extends Entity {
