@@ -4,9 +4,10 @@ import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 // Polyfills
 import 'url-search-params-polyfill';
+import 'typeface-roboto';
 
 ReactDOM.render(
-  <App />,
-  document.getElementById('root') as HTMLElement
+    <App/>,
+    document.getElementById('root') as HTMLElement
 );
 registerServiceWorker();

@@ -1,18 +1,18 @@
 import { listTripsFiltered, showTripDetail } from './TripService';
 
 jest.mock('../apiFetch', () => ({
-    authFetch: (query: any) => query
+    authFetch: (query: string) => query
 }));
 
 describe('listTripsFiltered', () => {
     it(`does not send vehicleId if parameter is missing`, () => {
-        const result = listTripsFiltered(2018, 1) as any;
+        const result = listTripsFiltered(2018, 1);
         expect(result).toContain('year=2018');
         expect(result).toContain('month=1');
         expect(result).not.toContain('vehicleId');
     });
     it('sends vehicleId if it is passed', () => {
-        const result = listTripsFiltered(2018, 1, 1) as any;
+        const result = listTripsFiltered(2018, 1, 1);
         expect(result).toContain('vehicleId');
     });
 });

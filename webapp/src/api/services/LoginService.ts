@@ -1,6 +1,6 @@
 import User from '../entities/user/User';
 
-if(window.localStorage === undefined) {
+if (window.localStorage === undefined) {
     const localStorageMock = (function() {
         let store = {};
 
@@ -8,7 +8,7 @@ if(window.localStorage === undefined) {
             getItem: function(key: string) {
                 return store[key] || null;
             },
-            setItem: function(key: string, value: any) {
+            setItem: function(key: string, value: string) {
                 store[key] = value.toString();
             },
             clear: function() {
@@ -33,29 +33,27 @@ export interface LoginState {
     user: User | null;
 }
 
-export type LoginStateSubscriber = (state: LoginState) => any;
+export type LoginStateSubscriber = (state: LoginState) => void;
 
 export type Subscription = Symbol;
 
 interface Subscriber {
-    key: any;
+    key: Subscription;
     value: LoginStateSubscriber;
 }
-
 
 //
 // Initialization
 //
 
-const expirationDate = window.localStorage.getItem('expirationDate');
+const storedExpiration = window.localStorage.getItem('expirationDate');
 
 let loginState: LoginState = {
     token: window.localStorage.getItem('token'),
-    expirationDate: expirationDate != null ? new Date(expirationDate) : null,
+    expirationDate: storedExpiration != null ? new Date(storedExpiration) : null,
     user: null
 };
 let subscribers: Subscriber[] = [];
-
 
 //
 // Functions
@@ -129,7 +127,6 @@ export const logIn = (email: string, password: string) => {
         })
         .then(state => setLoginState(state));
 };
-
 
 export const logOut = () => {
     if (getLoginState().token === null) {

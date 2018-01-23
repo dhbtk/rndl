@@ -105,7 +105,7 @@ describe('login and getting login state', () => {
             expect(expirationDate).toBeInstanceOf(Date);
             expect(user).toHaveProperty('id', 1);
             expect(user).toHaveProperty('email', 'test@test.com');
-            (window.fetch as Mock<any>).mockReturnValueOnce(Promise.resolve());
+            (window.fetch as Mock<Promise<null>>).mockReturnValueOnce(Promise.resolve());
             expect(logOut()).resolves.toBeUndefined().then(() => done());
         });
     });
