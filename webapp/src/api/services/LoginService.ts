@@ -1,4 +1,5 @@
 import User from '../entities/user/User';
+import 'url-search-params-polyfill';
 
 if (window.localStorage === undefined) {
     const localStorageMock = (function() {
@@ -105,13 +106,17 @@ export const authHeaders = (existing: RequestInit = {}): RequestInit => ({
  *
  */
 export const logIn = (email: string, password: string) => {
-    const data = new FormData();
+    const data = new URLSearchParams();
     data.set('username', email);
     data.set('password', password);
     return fetch('/api/token', {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
         body: data
-    }).then(response => response.json())
+    })
+        .then(response => response.ok ? response.json() : Promise.reject(null))
         .then(({ expires_in, access_token }) => {
             return fetch('/api/user', { headers: { 'Authorization': `Bearer ${access_token}` } })
                 .then(response => response.json()).then((user: User) => {
@@ -134,7 +139,7 @@ export const logOut = () => {
     } else {
         window.localStorage.clear();
         return fetch('/api/token', authHeaders({ method: 'DELETE' }))
-            .then(() => Promise.resolve());
+            .then(() => setLoginState({ token: null, user: null, expirationDate: null }));
     }
 };
 
@@ -142,16 +147,31 @@ export const logOut = () => {
 // Initialization
 //
 
-export const initialize = () => {
+export const initialize = (): Promise<User> => {
     if (loginState.expirationDate != null && loginState.expirationDate > new Date()) {
         setLoginState({ expirationDate: null, token: null, user: null });
+        return Promise.reject(null);
     }
 
     if (loginState.token) {
-        fetch('/api/user', authHeaders()).then(request => request.json()).then(user => setLoginState({
-            ...loginState,
-            user
-        }))
-            .then(null, () => setLoginState({ token: null, expirationDate: null, user: null }));
+        return new Promise<User>(((resolve, reject) => {
+            fetch('/api/user', authHeaders()).then(request => request.json()).then(user => setLoginState({
+                ...loginState,
+                user
+            }))
+                .then(
+                    () => resolve(getLoginState().user as User),
+                    () => {
+                        setLoginState({
+                            token: null,
+                            expirationDate: null,
+                            user: null
+                        });
+                        reject(null);
+                    });
+        }));
+
+    } else {
+        return Promise.reject(null);
     }
 };

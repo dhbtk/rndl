@@ -5,10 +5,14 @@ import { Route, Switch } from 'react-router';
 import LogInRoute from './components/login/LogInRoute';
 import RootRoute from './components/RootRoute';
 import Reboot from 'material-ui/Reboot';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import theme from './theme';
+import { CircularProgress } from 'material-ui';
 
 export interface State {
     login: LoginState;
     subscription: Subscription;
+    initializing: boolean;
 }
 
 class App extends React.Component<{}, State> {
@@ -17,8 +21,12 @@ class App extends React.Component<{}, State> {
     }
 
     componentWillMount() {
-        this.setState({ subscription: subscribe((login) => this.setState({ login })) });
-        initialize();
+        this.setState({
+            subscription: subscribe((login) => this.setState({ login })),
+            initializing: true
+        });
+        const stop = () => this.setState({ initializing: false });
+        initialize().then(stop, stop);
     }
 
     componentWillUnmount() {
@@ -26,17 +34,37 @@ class App extends React.Component<{}, State> {
     }
 
     render() {
+        if (this.state.initializing) {
+            return (
+                <MuiThemeProvider theme={theme}>
+                    <Reboot/>
+                    <div
+                        style={{
+                            width: '100vw',
+                            height: '100vh',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <CircularProgress size={32}/>
+                    </div>
+                </MuiThemeProvider>
+            );
+        }
         const loginState = this.state.login;
         return (
-            <div>
-                <Reboot/>
-                <BrowserRouter>
-                    <Switch>
-                        <Route path="/login" render={() => <LogInRoute loginState={loginState}/>}/>
-                        <Route path="/" render={() => <RootRoute loginState={loginState}/>}/>
-                    </Switch>
-                </BrowserRouter>
-            </div>
+            <MuiThemeProvider theme={theme}>
+                <div>
+                    <Reboot/>
+                    <BrowserRouter>
+                        <Switch>
+                            <Route path="/login" render={() => <LogInRoute loginState={loginState}/>}/>
+                            <Route path="/" render={() => <RootRoute loginState={loginState}/>}/>
+                        </Switch>
+                    </BrowserRouter>
+                </div>
+            </MuiThemeProvider>
         );
     }
 }

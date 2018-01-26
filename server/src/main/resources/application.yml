@@ -3,7 +3,6 @@ spring:
     url: jdbc:postgresql://localhost/rndl
 
 logging.level:
-  org.jooq: DEBUG
   org.jooq.Constants: WARN
 
 rndl:

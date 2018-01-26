@@ -1,15 +1,43 @@
 import { LoginState } from '../api/services/LoginService';
-import { Redirect } from 'react-router';
+import { Redirect, Route } from 'react-router';
 import * as React from 'react';
+import { WithStyles } from 'material-ui';
+import { StyleRules, Theme } from 'material-ui/styles';
+import withStyles from 'material-ui/styles/withStyles';
+import NavigationDrawer from './root/NavigationDrawer';
+import DashboardRoute from './dashboard/DashboardRoute';
+import User from '../api/entities/user/User';
 
 export interface Props {
     loginState: LoginState;
 }
 
-export default function RootRoute({ loginState }: Props) {
+type StyleProps = Props & WithStyles<string>;
+
+const styles = (theme: Theme): StyleRules => ({
+    root: {
+        display: 'flex'
+    },
+    content: {
+        flex: 1,
+        width: 'calc(100% - 300px)', // TODO responsiveness: only if drawer is fixed open
+        marginLeft: '300px' // same as above
+    }
+});
+
+const RootRoute = ({ loginState, classes }: StyleProps) => {
     if (!loginState.user) {
         return <Redirect to="/login"/>;
     } else {
-        return <span>root</span>;
+        return (
+            <div className={classes.root}>
+                <NavigationDrawer user={loginState.user} open={true}/>
+                <div className={classes.content}>
+                    <Route exact={true} path="/" render={() => <DashboardRoute user={loginState.user as User}/>}/>
+                </div>
+            </div>
+        );
     }
-}
+};
+
+export default withStyles(styles)(RootRoute) as React.StatelessComponent<Props>;

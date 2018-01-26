@@ -40,8 +40,8 @@ constructor(
         ServerAuthenticationEntryPoint {
 
     companion object {
-        private val AUTHORIZATION_HEADER = "Authorization"
-        private val AUTHORIZATION_TYPE = "Bearer"
+        private const val AUTHORIZATION_HEADER = "Authorization"
+        private const val AUTHORIZATION_TYPE = "Bearer"
     }
 
     private val algorithm = Algorithm.HMAC512(settings.jwtSecret)
