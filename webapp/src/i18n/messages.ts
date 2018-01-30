@@ -24,7 +24,13 @@ const messages: Messages = {
         'tripList.traveledThisMonth': 'traveled this month',
         'tripList.tripsOnDay': '{count, plural, one {#trip} other {# trips}}',
         'tripList.economyLabel': '{economy} km/l',
-        'tripList.speedLabel': '{speed} km/h'
+        'tripList.speedLabel': '{speed} km/h',
+        'tripList.timeHeader': 'Time',
+        'tripList.durationHeader': 'Duration',
+        'tripList.vehicleHeader': 'Vehicle',
+        'tripList.distanceHeader': 'Distance',
+        'tripList.economyHeader': 'Economy',
+        'tripList.averageSpeedHeader': 'Average speed'
     }
 };
 

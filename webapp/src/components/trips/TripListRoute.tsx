@@ -84,8 +84,11 @@ class TripListRoute extends React.Component<StyleProps, State> {
                 </PaddedAppBar>
                 <PaddedContainer height={2}>
                     <Paper>
-                        {(this.state.trips as GroupedTripList[]).map(group => <TripTable key={group.date}
-                                                                                         group={group}/>)}
+                        {(this.state.trips as GroupedTripList[]).map(group => (
+                            <TripTable
+                                key={group.date}
+                                group={group}
+                            />))}
                     </Paper>
                 </PaddedContainer>
             </div>

@@ -88,8 +88,11 @@ class MonthlyDistanceGraph extends React.Component<InternalProps> {
             return (
                 <Card>
                     <CardContent>
-                        <Typography type="headline"><FormattedMessage
-                            id="tripList.distanceTraveledThisMonth"/></Typography>
+                        <Typography type="headline">
+                            <FormattedMessage
+                                id="tripList.distanceTraveledThisMonth"
+                            />
+                        </Typography>
                         <canvas id="distanceTraveledGraph" height="200px" width="400px"/>
                     </CardContent>
                 </Card>

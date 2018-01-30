@@ -29,12 +29,12 @@ class TripTable extends React.Component<Props & InjectedIntlProps & WithStyles<s
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Hora</TableCell>
-                            <TableCell>Duração</TableCell>
-                            <TableCell>Veículo</TableCell>
-                            <TableCell>Distância</TableCell>
-                            <TableCell>Economia</TableCell>
-                            <TableCell>Velocidade média</TableCell>
+                            <TableCell><FormattedMessage id="tripList.timeHeader"/></TableCell>
+                            <TableCell><FormattedMessage id="tripList.durationHeader"/></TableCell>
+                            <TableCell><FormattedMessage id="tripList.vehicleHeader"/></TableCell>
+                            <TableCell><FormattedMessage id="tripList.distanceHeader"/></TableCell>
+                            <TableCell><FormattedMessage id="tripList.economyHeader"/></TableCell>
+                            <TableCell><FormattedMessage id="tripList.averageSpeedHeader"/></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -57,7 +57,8 @@ class TripTable extends React.Component<Props & InjectedIntlProps & WithStyles<s
                                     <FormattedMessage
                                         id="tripList.distanceLabel"
                                         values={{
-                                            km: <FormattedNumber style="decimal" value={trip.distance / 1000}/>
+                                            km: <FormattedNumber style="decimal"
+                                                                 value={+(trip.distance / 1000).toFixed(1)}/>
                                         }}
                                     />
                                 </TableCell>
