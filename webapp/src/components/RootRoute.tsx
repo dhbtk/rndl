@@ -7,6 +7,7 @@ import withStyles from 'material-ui/styles/withStyles';
 import NavigationDrawer from './root/NavigationDrawer';
 import DashboardRoute from './dashboard/DashboardRoute';
 import User from '../api/entities/user/User';
+import TripListRoute from './trips/TripListRoute';
 
 export interface Props {
     loginState: LoginState;
@@ -34,6 +35,10 @@ const RootRoute = ({ loginState, classes }: StyleProps) => {
                 <NavigationDrawer user={loginState.user} open={true}/>
                 <div className={classes.content}>
                     <Route exact={true} path="/" render={() => <DashboardRoute user={loginState.user as User}/>}/>
+
+                    <Route exact={true} path="/trips" component={TripListRoute}/>
+                    <Route exact={true} path="/trips/:year/:month" component={TripListRoute}/>
+                    <Route exact={true} path="/trips/:year/:month/:vehicleId" component={TripListRoute}/>
                 </div>
             </div>
         );

@@ -1,9 +1,9 @@
 import 'url-search-params-polyfill';
 import Trip from '../entities/vehicle/Trip';
-import Page from '../entities/Page';
 import { authFetch } from '../apiFetch';
+import GroupedTripList from '../entities/vehicle/GroupedTripList';
 
-export const listTripsFiltered = (year: number, month: number, vehicleId: number | null = null): Promise<Page<Trip>> => {
+export const listTripsFiltered = (year: number, month: number, vehicleId: number | null = null): Promise<GroupedTripList[]> => {
     const params = new URLSearchParams();
     params.set('year', year.toString());
     params.set('month', month.toString());

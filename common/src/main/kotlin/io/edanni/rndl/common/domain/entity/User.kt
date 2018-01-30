@@ -35,9 +35,4 @@ data class User constructor(
 
     @JsonIgnore
     override fun isAccountNonLocked(): Boolean = true
-
-    @JsonIgnore
-    override fun getName(): String {
-        return super.getName()
-    }
 }

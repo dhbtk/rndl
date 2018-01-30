@@ -20,9 +20,11 @@ import org.threeten.bp.LocalTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.TemporalAdjusters
 import java.math.BigDecimal
+import java.util.logging.Logger
 
 @Repository
 class TripRepository(private val create: DSLContext, private val jdbcTemplate: JdbcTemplate) {
+    val log = Logger.getLogger(this::class.qualifiedName)
 
     fun listTripsFiltered(year: Int, month: Int, user: User, vehicleId: Long?): List<Trip> {
         val monthStart = LocalDate.of(year, month, 1).with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay()
@@ -31,7 +33,7 @@ class TripRepository(private val create: DSLContext, private val jdbcTemplate: J
         return create.select().from(TRIP)
                 .innerJoin(VEHICLE).onKey()
                 .innerJoin(USER_GROUP).onKey()
-                .innerJoin(USER_GROUP_MEMBERSHIP).onKey()
+                .innerJoin(USER_GROUP_MEMBERSHIP).on(USER_GROUP.ID.eq(USER_GROUP_MEMBERSHIP.USER_GROUP_ID))
                 .where(TRIP.VEHICLE_ID.eq(vehicleId).or("?::bigint is null", vehicleId))
                 .and(tripStart.between(monthStart, monthEnd))
                 .and(USER_GROUP_MEMBERSHIP.USER_ID.eq(user.id))
@@ -51,7 +53,7 @@ class TripRepository(private val create: DSLContext, private val jdbcTemplate: J
         return create.select().from(TRIP)
                 .innerJoin(VEHICLE).onKey()
                 .innerJoin(USER_GROUP).onKey()
-                .innerJoin(USER_GROUP_MEMBERSHIP).onKey()
+                .innerJoin(USER_GROUP_MEMBERSHIP).on(USER_GROUP.ID.eq(USER_GROUP_MEMBERSHIP.USER_GROUP_ID))
                 .where(TRIP.ID.eq(id))
                 .and(USER_GROUP_MEMBERSHIP.USER_ID.eq(user.id))
                 .fetchOptional()

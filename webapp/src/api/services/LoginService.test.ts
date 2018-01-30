@@ -1,4 +1,4 @@
-import { authHeaders, getLoginState, logIn, logOut, setLoginState, subscribe, unsubscribe } from './LoginService';
+import { authHeaders, getLoginState, setLoginState, signIn, signOut, subscribe, unsubscribe } from './LoginService';
 import Mock = jest.Mock;
 
 describe('getLoginState', () => {
@@ -88,7 +88,7 @@ const mockLoginFetch = () => {
 describe('login and getting login state', () => {
     it('logs in and returns correct login state', done => {
         window.fetch = mockLoginFetch();
-        logIn('abc', '123').then(() => {
+        signIn('abc', '123').then(() => {
             const { token, expirationDate, user } = getLoginState();
             expect(token).toBe('MOCKTOKEN');
             expect(expirationDate).toBeInstanceOf(Date);
@@ -99,14 +99,14 @@ describe('login and getting login state', () => {
     });
     it('logs in and logs out', done => {
         window.fetch = mockLoginFetch();
-        logIn('abc', '123').then(() => {
+        signIn('abc', '123').then(() => {
             const { token, expirationDate, user } = getLoginState();
             expect(token).toBe('MOCKTOKEN');
             expect(expirationDate).toBeInstanceOf(Date);
             expect(user).toHaveProperty('id', 1);
             expect(user).toHaveProperty('email', 'test@test.com');
             (window.fetch as Mock<Promise<null>>).mockReturnValueOnce(Promise.resolve());
-            expect(logOut()).resolves.toBeUndefined().then(() => done());
+            expect(signOut()).resolves.toBeUndefined().then(() => done());
         });
     });
 });

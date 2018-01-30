@@ -105,7 +105,7 @@ export const authHeaders = (existing: RequestInit = {}): RequestInit => ({
 /**
  *
  */
-export const logIn = (email: string, password: string) => {
+export const signIn = (email: string, password: string) => {
     const data = new URLSearchParams();
     data.set('username', email);
     data.set('password', password);
@@ -133,7 +133,7 @@ export const logIn = (email: string, password: string) => {
         .then(state => setLoginState(state));
 };
 
-export const logOut = () => {
+export const signOut = () => {
     if (getLoginState().token === null) {
         return Promise.reject('Not logged in');
     } else {

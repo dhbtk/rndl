@@ -46,19 +46,20 @@ class VehicleRepository(private val create: DSLContext) {
             Page(count, 0, count, 1, result)
         }
 
-        val ids = vehicles.content.map { it.id!! }
-
-        val t = TRIP.`as`("t")
-
-        val entries = create.select().from(ENTRY)
-                .join(TRIP).onKey()
-                .where(TRIP.VEHICLE_ID.`in`(ids))
-                .and(ENTRY.ID.eq(create.select(ENTRY.ID)
-                        .from(ENTRY).join(t).onKey()
-                        .where(t.VEHICLE_ID.eq(TRIP.VEHICLE_ID)).and(ENTRY.COORDINATES.isNotNull).orderBy(ENTRY.DEVICE_TIME.desc()).limit(1)))
-                .fetch { record ->
-                    record.into(TRIP).vehicleId to recordToData(record.into(ENTRY), Entry::class)
-                }.toMap()
+        val entries = vehicles.content
+                .map { it.id }
+                .map { id ->
+                    create.select().from(ENTRY)
+                            .innerJoin(TRIP).onKey()
+                            .where(TRIP.VEHICLE_ID.eq(id))
+                            .and(ENTRY.COORDINATES.isNotNull)
+                            .orderBy(ENTRY.DEVICE_TIME.desc())
+                            .limit(1)
+                            .fetchOptional()
+                            .map { id to recordToData(it.into(ENTRY), Entry::class) }
+                }
+                .filter { it.isPresent }
+                .map { it.get() }.toMap()
 
         return vehicles.copy(content = vehicles.content.map { it.copy(latestEntry = entries[it.id]) })
     }

@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { FormEvent } from 'react';
-import { getLoginState, logIn, LoginState } from '../../api/services/LoginService';
+import { getLoginState, LoginState, signIn } from '../../api/services/LoginService';
 import { StyleRules, Theme } from 'material-ui/styles';
 import withStyles from 'material-ui/styles/withStyles';
 import { Button, CircularProgress, TextField, Typography, WithStyles } from 'material-ui';
 import Paper from 'material-ui/Paper';
 import { Redirect } from 'react-router';
+import { FormattedMessage, InjectedIntlProps, injectIntl } from 'react-intl';
 
 export interface Props {
     loginState: LoginState;
@@ -21,7 +22,7 @@ export interface State {
 
 const loginStyle = (theme: Theme): StyleRules => ({
     root: {
-        background: (theme.palette.primary as any).main,
+        backgroundImage: `url(${require('./background.jpg')})`,
         height: '100vh',
         width: '100vw',
         display: 'flex',
@@ -54,10 +55,10 @@ const loginStyle = (theme: Theme): StyleRules => ({
     }
 });
 
-type StyleProps = Props & WithStyles<string>;
+type InternalProps = Props & WithStyles<string> & InjectedIntlProps;
 
-class LogInRoute extends React.Component<StyleProps, State> {
-    constructor(props: StyleProps) {
+class LogInRoute extends React.Component<InternalProps, State> {
+    constructor(props: InternalProps) {
         super(props);
         this.state = {
             email: '',
@@ -73,7 +74,7 @@ class LogInRoute extends React.Component<StyleProps, State> {
     logIn(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         this.setState({ loading: true });
-        logIn(this.state.email, this.state.password).then(
+        signIn(this.state.email, this.state.password).then(
             () => this.setState({ loggedIn: true }),
             () => {
                 this.setState({
@@ -88,36 +89,52 @@ class LogInRoute extends React.Component<StyleProps, State> {
             return <Redirect to="/"/>;
         }
 
+        const { formatMessage } = this.props.intl;
+
         return (
             <div className={this.props.classes.root}>
                 <Paper className={this.props.classes.paper}>
-                    <Typography type="display1" gutterBottom={true}
-                                className={this.props.classes.tempLogo}>RNDL</Typography>
-                    {this.state.error && <Typography type="body1">Usuário ou senha inválidos.</Typography>}
+                    <Typography
+                        type="display1"
+                        gutterBottom={true}
+                        className={this.props.classes.tempLogo}
+                    >
+                        RNDL
+                    </Typography>
+                    {this.state.error &&
+                    <Typography type="body1"><FormattedMessage id="login.invalidCredentials"/></Typography>}
                     <form onSubmit={this.logIn} className={this.props.classes.form}>
                         <TextField
                             required={true}
                             autoFocus={true}
-                            label="Email address"
+                            label={formatMessage({ id: 'login.emailAddressLabel' })}
                             value={this.state.email}
                             type="email"
                             onChange={event => this.setState({ email: event.target.value })}
                         />
                         <TextField
                             required={true}
-                            label="Password"
+                            label={formatMessage({ id: 'login.passwordLabel' })}
                             value={this.state.password}
                             type="password"
                             onChange={event => this.setState({ password: event.target.value })}
                         />
-                        <Button raised={true} color="primary" disabled={this.state.loading} type="submit"
-                                style={{ position: 'relative' }}>
-                            Sign in
-                            {this.state.loading && <CircularProgress size={24} style={{
-                                position: 'absolute',
-                                right: '8px',
-                                top: 'calc(50% - 12px)'
-                            }}/>}
+                        <Button
+                            raised={true}
+                            color="primary"
+                            disabled={this.state.loading}
+                            type="submit"
+                            style={{ position: 'relative' }}
+                        >
+                            <FormattedMessage id="login.signInLabel"/>
+                            {this.state.loading && <CircularProgress
+                                size={24}
+                                style={{
+                                    position: 'absolute',
+                                    right: '8px',
+                                    top: 'calc(50% - 12px)'
+                                }}
+                            />}
                         </Button>
                     </form>
                 </Paper>
@@ -126,4 +143,4 @@ class LogInRoute extends React.Component<StyleProps, State> {
     }
 }
 
-export default withStyles(loginStyle)(LogInRoute) as React.ComponentClass<Props>;
+export default injectIntl(withStyles(loginStyle)(LogInRoute)) as React.ComponentClass<Props>;

@@ -3,9 +3,11 @@ import { ReactNode } from 'react';
 
 export interface Props {
     narrow?: boolean;
+    height?: number;
 }
 
-export default function PaddedContainer({ children, narrow }: Props & { children?: ReactNode }) {
+export default function PaddedContainer({ children, narrow, height }: Props & { children?: ReactNode }) {
+    const actualHeight = height || 1;
     return (
         <div
             style={{
@@ -13,7 +15,7 @@ export default function PaddedContainer({ children, narrow }: Props & { children
                 maxWidth: narrow ? '900px' : '100%',
                 paddingLeft: '24px',
                 paddingRight: '24px',
-                paddingTop: '80px'
+                paddingTop: `${16 + actualHeight * 64}px`
             }}
         >
             {children}

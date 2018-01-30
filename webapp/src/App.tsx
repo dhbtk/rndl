@@ -8,6 +8,9 @@ import Reboot from 'material-ui/Reboot';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import theme from './theme';
 import { CircularProgress } from 'material-ui';
+import { IntlProvider } from 'react-intl';
+import 'react-intl/locale-data/en';
+import messages from './i18n/messages';
 
 export interface State {
     login: LoginState;
@@ -16,7 +19,7 @@ export interface State {
 }
 
 class App extends React.Component<{}, State> {
-    constructor(props: Object) {
+    constructor(props: {}) {
         super(props);
     }
 
@@ -54,17 +57,19 @@ class App extends React.Component<{}, State> {
         }
         const loginState = this.state.login;
         return (
-            <MuiThemeProvider theme={theme}>
-                <div>
-                    <Reboot/>
-                    <BrowserRouter>
-                        <Switch>
-                            <Route path="/login" render={() => <LogInRoute loginState={loginState}/>}/>
-                            <Route path="/" render={() => <RootRoute loginState={loginState}/>}/>
-                        </Switch>
-                    </BrowserRouter>
-                </div>
-            </MuiThemeProvider>
+            <IntlProvider locale="en" messages={messages.en}>
+                <MuiThemeProvider theme={theme}>
+                    <div>
+                        <Reboot/>
+                        <BrowserRouter>
+                            <Switch>
+                                <Route path="/login" render={() => <LogInRoute loginState={loginState}/>}/>
+                                <Route path="/" render={() => <RootRoute loginState={loginState}/>}/>
+                            </Switch>
+                        </BrowserRouter>
+                    </div>
+                </MuiThemeProvider>
+            </IntlProvider>
         );
     }
 }
