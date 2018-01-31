@@ -5,6 +5,7 @@ import Typography from 'material-ui/Typography';
 import Divider from 'material-ui/Divider';
 import { StyleRules, Theme, withStyles } from 'material-ui/styles';
 import { Table, TableBody, TableCell, TableHead, TableRow, WithStyles } from 'material-ui';
+import { Link } from 'react-router-dom';
 
 export interface Props {
     group: GroupedTripList;
@@ -32,51 +33,63 @@ class TripTable extends React.Component<Props & InjectedIntlProps & WithStyles<s
                             <TableCell><FormattedMessage id="tripList.timeHeader"/></TableCell>
                             <TableCell><FormattedMessage id="tripList.durationHeader"/></TableCell>
                             <TableCell><FormattedMessage id="tripList.vehicleHeader"/></TableCell>
-                            <TableCell><FormattedMessage id="tripList.distanceHeader"/></TableCell>
-                            <TableCell><FormattedMessage id="tripList.economyHeader"/></TableCell>
-                            <TableCell><FormattedMessage id="tripList.averageSpeedHeader"/></TableCell>
+                            <TableCell numeric={true}><FormattedMessage id="tripList.distanceHeader"/></TableCell>
+                            <TableCell numeric={true}><FormattedMessage id="tripList.economyHeader"/></TableCell>
+                            <TableCell numeric={true}><FormattedMessage id="tripList.averageSpeedHeader"/></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {this.props.group.trips.map(trip => (
                             <TableRow key={trip.id}>
                                 <TableCell>
-                                    <FormattedDate
-                                        value={trip.startTime}
-                                        hour="numeric"
-                                        minute="numeric"
-                                    />
+                                    <Link to={`/trips/${trip.id}`}>
+                                        <FormattedDate
+                                            value={trip.startTime}
+                                            hour="numeric"
+                                            minute="numeric"
+                                        />
+                                    </Link>
                                 </TableCell>
                                 <TableCell>
                                     {trip.duration}
                                 </TableCell>
                                 <TableCell>
-                                    {trip.vehicle.name}
+                                    <Link to={`/vehicles/${trip.vehicleId}`}>
+                                        {trip.vehicle.name} {trip.vehicle.licensePlate !== null && `&bull; ${trip.vehicle.licensePlate}`}
+                                    </Link>
                                 </TableCell>
-                                <TableCell>
-                                    <FormattedMessage
-                                        id="tripList.distanceLabel"
-                                        values={{
-                                            km: <FormattedNumber style="decimal"
-                                                                 value={+(trip.distance / 1000).toFixed(1)}/>
-                                        }}
-                                    />
+                                <TableCell numeric={true}>
+                                    {trip.distance === null ? '-' :
+                                        <FormattedMessage
+                                            id="tripList.distanceLabel"
+                                            values={{
+                                                km:
+                                                    <FormattedNumber
+                                                        style="decimal"
+                                                        value={+(trip.distance / 1000).toFixed(1)}
+                                                    />
+                                            }}
+                                        />}
                                 </TableCell>
-                                <TableCell>
-                                    <FormattedMessage
-                                        id="tripList.economyLabel"
-                                        values={{
-                                            economy: <FormattedNumber style="decimal" value={trip.economy}/>
-                                        }}
-                                    />
+                                <TableCell numeric={true}>
+                                    {trip.economy === null ? '-' :
+                                        <FormattedMessage
+                                            id="tripList.economyLabel"
+                                            values={{
+                                                economy: <FormattedNumber style="decimal" value={trip.economy}/>
+                                            }}
+                                        />
+                                    }
                                 </TableCell>
-                                <TableCell>
-                                    <FormattedMessage
-                                        id="tripList.speedLabel"
-                                        values={{
-                                            speed: <FormattedNumber style="decimal" value={trip.averageSpeed}/>
-                                        }}
-                                    />
+                                <TableCell numeric={true}>
+                                    {trip.averageSpeed === null ? '-' :
+                                        <FormattedMessage
+                                            id="tripList.speedLabel"
+                                            values={{
+                                                speed: <FormattedNumber style="decimal" value={trip.averageSpeed}/>
+                                            }}
+                                        />
+                                    }
                                 </TableCell>
                             </TableRow>
                         ))}

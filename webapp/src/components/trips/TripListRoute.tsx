@@ -1,7 +1,7 @@
 import { match } from 'react-router';
 import { StyleRules, Theme } from 'material-ui/styles';
 import * as React from 'react';
-import { WithStyles } from 'material-ui';
+import { CircularProgress, WithStyles } from 'material-ui';
 import PaddedAppBar from '../common/PaddedAppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
@@ -11,6 +11,10 @@ import GroupedTripList from '../../api/entities/vehicle/GroupedTripList';
 import { listTripsFiltered } from '../../api/services/TripService';
 import Paper from 'material-ui/Paper';
 import TripTable from './TripTable';
+import { FormattedDate } from 'react-intl';
+import IconButton from 'material-ui/IconButton';
+import Icon from 'material-ui/Icon';
+import { Link } from 'react-router-dom';
 
 interface Params {
     year?: string;
@@ -30,7 +34,22 @@ interface State {
     trips?: GroupedTripList[];
 }
 
-const styles = (theme: Theme): StyleRules => ({});
+const styles = (theme: Theme): StyleRules => ({
+    root: {
+        position: 'relative'
+    },
+    overlay: {
+        position: 'absolute',
+        width: '100%',
+        height: '100vh',
+        background: 'rgba(255, 255, 255, 0.54)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        top: 0,
+        left: 0
+    }
+});
 
 type StyleProps = Props & WithStyles<string>;
 
@@ -71,15 +90,50 @@ class TripListRoute extends React.Component<StyleProps, State> {
         }
     }
 
+    urlFor([year, month]: [number, number]) {
+        return `/trips/${year}/${month}${this.state.vehicleId ?
+            '/' + this.state.vehicleId : ''}`;
+    }
+
+    nextMonth(year: number, month: number): [number, number] {
+        if (month === 12) {
+            return [year + 1, 1];
+        } else {
+            return [year, month + 1];
+        }
+    }
+
+    previousMonth(year: number, month: number): [number, number] {
+        if (month === 1) {
+            return [year - 1, 12];
+        } else {
+            return [year, month - 1];
+        }
+    }
+
     render() {
         return (
-            <div>
+            <div className={this.props.classes.root}>
                 <PaddedAppBar position="fixed">
                     <Toolbar>
                         <Typography type="title">Trips</Typography>
                     </Toolbar>
                     <Toolbar>
-                        <Typography>{this.state.loadingTrips && 'Loading...'}</Typography>
+                        <IconButton component={props => <Link
+                            to={this.urlFor(this.previousMonth(this.state.year, this.state.month))} {...props} />}>
+                            <Icon>navigate_before</Icon>
+                        </IconButton>
+                        <IconButton component={props => <Link
+                            to={this.urlFor(this.nextMonth(this.state.year, this.state.month))} {...props} />}>
+                            <Icon>navigate_next</Icon>
+                        </IconButton>
+                        <Typography type="title">
+                            <FormattedDate
+                                value={new Date(this.state.year, this.state.month, 0)}
+                                year="numeric"
+                                month="long"
+                            />
+                        </Typography>
                     </Toolbar>
                 </PaddedAppBar>
                 <PaddedContainer height={2}>
@@ -91,6 +145,11 @@ class TripListRoute extends React.Component<StyleProps, State> {
                             />))}
                     </Paper>
                 </PaddedContainer>
+                {this.state.loadingTrips && (
+                    <div className={this.props.classes.overlay}>
+                        <CircularProgress size={64}/>
+                    </div>
+                )}
             </div>
         );
     }

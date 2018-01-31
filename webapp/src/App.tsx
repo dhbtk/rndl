@@ -10,6 +10,7 @@ import theme from './theme';
 import { CircularProgress } from 'material-ui';
 import { IntlProvider } from 'react-intl';
 import 'react-intl/locale-data/en';
+import 'react-intl/locale-data/pt';
 import messages from './i18n/messages';
 
 export interface State {
