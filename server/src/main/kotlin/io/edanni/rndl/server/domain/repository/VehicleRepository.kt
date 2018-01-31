@@ -15,6 +15,7 @@ import io.edanni.rndl.server.infrastructure.pagination.Page
 import io.edanni.rndl.server.infrastructure.pagination.PageRequest
 import io.edanni.rndl.server.infrastructure.repository.RecordNotFoundException
 import org.jooq.DSLContext
+import org.jooq.Record
 import org.jooq.SelectConditionStep
 import org.jooq.SelectWhereStep
 import org.springframework.stereotype.Repository
@@ -32,20 +33,21 @@ class VehicleRepository(private val create: DSLContext) {
                                     .innerJoin(USER_GROUP).onKey()
                                     .where(USER_GROUP_MEMBERSHIP.USER_ID.eq(user.id))))
         }
-
         val count = where(create.selectCount().from(VEHICLE)).execute()
-
+        val query = where(create
+                .select().from(VEHICLE)
+                .innerJoin(USER_GROUP).onKey()).orderBy(VEHICLE.NAME)
+        val fetch: (record: Record) -> Vehicle = {
+            recordToData(it.into(VEHICLE) as VehicleRecord, Vehicle::class).copy(
+                    userGroup = recordToData(it.into(USER_GROUP), UserGroup::class))
+        }
         val vehicles = if (page.page != null) {
-            val result = where(create
-                    .select().from(VEHICLE)
-                    .innerJoin(USER_GROUP).onKey()).orderBy(VEHICLE.NAME).limit(page.size).offset(page.size * page.page)
-                    .fetch { recordToData(it.into(VEHICLE) as VehicleRecord, Vehicle::class).copy(userGroup = recordToData(it.into(USER_GROUP), UserGroup::class)) }
+            val result = query.limit(page.size).offset(page.size * page.page).fetch(fetch)
             Page(count, page.page, result.size, count / page.size, result)
         } else {
-            val result = where(create.selectFrom(VEHICLE)).orderBy(VEHICLE.NAME).fetch { recordToData(it as VehicleRecord, Vehicle::class) }
+            val result = query.fetch(fetch)
             Page(count, 0, count, 1, result)
         }
-
         val entries = vehicles.content
                 .map { it.id }
                 .map { id ->
