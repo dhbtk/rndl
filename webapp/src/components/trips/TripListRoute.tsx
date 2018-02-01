@@ -15,6 +15,7 @@ import { FormattedDate } from 'react-intl';
 import IconButton from 'material-ui/IconButton';
 import Icon from 'material-ui/Icon';
 import { Link } from 'react-router-dom';
+import NoTrips from './NoTrips';
 
 interface Params {
     year?: string;
@@ -31,7 +32,7 @@ interface State {
     month: number;
     vehicleId?: number;
     loadingTrips: boolean;
-    trips?: GroupedTripList[];
+    trips: GroupedTripList[];
 }
 
 const styles = (theme: Theme): StyleRules => ({
@@ -119,12 +120,22 @@ class TripListRoute extends React.Component<StyleProps, State> {
                         <Typography type="title">Trips</Typography>
                     </Toolbar>
                     <Toolbar>
-                        <IconButton component={props => <Link
-                            to={this.urlFor(this.previousMonth(this.state.year, this.state.month))} {...props} />}>
+                        <IconButton
+                            component={props => (
+                                <Link
+                                    to={this.urlFor(this.previousMonth(this.state.year, this.state.month))}
+                                    {...props}
+                                />)}
+                        >
                             <Icon>navigate_before</Icon>
                         </IconButton>
-                        <IconButton component={props => <Link
-                            to={this.urlFor(this.nextMonth(this.state.year, this.state.month))} {...props} />}>
+                        <IconButton
+                            component={props => (
+                                <Link
+                                    to={this.urlFor(this.nextMonth(this.state.year, this.state.month))}
+                                    {...props}
+                                />)}
+                        >
                             <Icon>navigate_next</Icon>
                         </IconButton>
                         <Typography type="title">
@@ -138,12 +149,13 @@ class TripListRoute extends React.Component<StyleProps, State> {
                 </PaddedAppBar>
                 <PaddedContainer height={2}>
                     <Paper>
-                        {(this.state.trips as GroupedTripList[]).map(group => (
+                        {this.state.trips.map(group => (
                             <TripTable
                                 key={group.date}
                                 group={group}
                             />))}
                     </Paper>
+                    {!this.state.loadingTrips && this.state.trips.length === 0 && <NoTrips />}
                 </PaddedContainer>
                 {this.state.loadingTrips && (
                     <div className={this.props.classes.overlay}>

@@ -17,12 +17,7 @@ const messages: Messages = {
         'drawerMenu.trips': 'Trips',
         // TripListRoute
         'tripList.title': 'Trips',
-        'tripList.distanceTraveledThisMonth': 'Distance traveled this month',
-        'tripList.distanceAxisLabel': 'Distance',
         'tripList.distanceLabel': '{km} km',
-        'tripList.distanceInDay': 'traveled in {date}',
-        'tripList.traveledThisMonth': 'traveled this month',
-        'tripList.tripsOnDay': '{count, plural, one {#trip} other {# trips}}',
         'tripList.economyLabel': '{economy} km/l',
         'tripList.speedLabel': '{speed} km/h',
         'tripList.timeHeader': 'Time',
@@ -30,7 +25,9 @@ const messages: Messages = {
         'tripList.vehicleHeader': 'Vehicle',
         'tripList.distanceHeader': 'Distance',
         'tripList.economyHeader': 'Economy',
-        'tripList.averageSpeedHeader': 'Average speed'
+        'tripList.averageSpeedHeader': 'Average speed',
+        'noTrips.noTripsHeader': 'No trips this month',
+        'noTrips.noTripsMessage': 'Go out and drive!'
     }
 };
 
