@@ -1,9 +1,6 @@
 package io.edanni.rndl.server.domain.repository
 
-import io.edanni.rndl.common.domain.entity.Entry
-import io.edanni.rndl.common.domain.entity.User
-import io.edanni.rndl.common.domain.entity.UserGroup
-import io.edanni.rndl.common.domain.entity.Vehicle
+import io.edanni.rndl.common.domain.entity.*
 import io.edanni.rndl.jooq.tables.Entry.ENTRY
 import io.edanni.rndl.jooq.tables.Trip.TRIP
 import io.edanni.rndl.jooq.tables.UserGroup.USER_GROUP
@@ -70,8 +67,7 @@ class VehicleRepository(private val create: DSLContext) {
         return create.select()
                 .from(VEHICLE)
                 .innerJoin(USER_GROUP).onKey()
-                .innerJoin(USER_GROUP_MEMBERSHIP).onKey()
-                .leftJoin(TRIP).onKey()
+                .innerJoin(USER_GROUP_MEMBERSHIP).on(USER_GROUP_MEMBERSHIP.USER_GROUP_ID.eq(USER_GROUP.ID))
                 .leftJoin(ENTRY).on(ENTRY.ID.eq(
                 create.select(ENTRY.ID)
                         .from(ENTRY).join(TRIP).onKey()
@@ -82,7 +78,9 @@ class VehicleRepository(private val create: DSLContext) {
                 .map {
                     recordToData(it.into(VEHICLE), Vehicle::class).copy(
                             latestEntry = recordToData(it.into(ENTRY), Entry::class),
-                            userGroup = recordToData(it.into(USER_GROUP), UserGroup::class)
+                            userGroup = recordToData(it.into(USER_GROUP), UserGroup::class).copy(
+                                    userGroupMemberships = listOf(recordToData(it.into(USER_GROUP_MEMBERSHIP), UserGroupMembership::class))
+                            )
                     )
                 }
                 .orElseThrow { RecordNotFoundException(Vehicle::class, id) }
