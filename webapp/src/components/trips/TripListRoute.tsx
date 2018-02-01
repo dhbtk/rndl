@@ -1,7 +1,7 @@
 import { match } from 'react-router';
 import { StyleRules, Theme } from 'material-ui/styles';
 import * as React from 'react';
-import { CircularProgress, WithStyles } from 'material-ui';
+import { WithStyles } from 'material-ui';
 import PaddedAppBar from '../common/PaddedAppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
@@ -16,6 +16,7 @@ import IconButton from 'material-ui/IconButton';
 import Icon from 'material-ui/Icon';
 import { Link } from 'react-router-dom';
 import NoTrips from './NoTrips';
+import LoadingOverlay from '../common/LoadingOverlay';
 
 interface Params {
     year?: string;
@@ -38,17 +39,6 @@ interface State {
 const styles = (theme: Theme): StyleRules => ({
     root: {
         position: 'relative'
-    },
-    overlay: {
-        position: 'absolute',
-        width: '100%',
-        height: '100vh',
-        background: 'rgba(255, 255, 255, 0.54)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        top: 0,
-        left: 0
     }
 });
 
@@ -157,11 +147,7 @@ class TripListRoute extends React.Component<StyleProps, State> {
                     </Paper>
                     {!this.state.loadingTrips && this.state.trips.length === 0 && <NoTrips />}
                 </PaddedContainer>
-                {this.state.loadingTrips && (
-                    <div className={this.props.classes.overlay}>
-                        <CircularProgress size={64}/>
-                    </div>
-                )}
+                {this.state.loadingTrips && <LoadingOverlay />}
             </div>
         );
     }
