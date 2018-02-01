@@ -33,4 +33,4 @@ class TripDayList extends React.Component<Props & InjectedIntlProps> {
     }
 }
 
-export default injectIntl(TripDayList) as React.ComponentClass<Props>;
+export default injectIntl<Props>(TripDayList);

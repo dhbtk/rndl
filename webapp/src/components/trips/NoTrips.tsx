@@ -31,4 +31,4 @@ function NoTrips({ classes }: WithStyles) {
     );
 }
 
-export default withStyles(styles)(NoTrips) as React.StatelessComponent<{}>;
+export default withStyles(styles)<{}>(NoTrips);

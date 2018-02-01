@@ -20,4 +20,4 @@ function PaddedAppBar(props: AppBarProps & WithStyles<string>) {
     return <AppBar {...usedProps}>{props.children}</AppBar>;
 }
 
-export default withStyles(style)(PaddedAppBar) as React.StatelessComponent<AppBarProps>;
+export default withStyles(style)<AppBarProps>(PaddedAppBar);

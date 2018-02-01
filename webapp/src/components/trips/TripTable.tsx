@@ -101,4 +101,4 @@ class TripTable extends React.Component<Props & InjectedIntlProps & WithStyles<s
     }
 }
 
-export default injectIntl(withStyles(styles)(TripTable)) as React.ComponentClass<Props>;
+export default injectIntl<Props>(withStyles(styles)(TripTable));

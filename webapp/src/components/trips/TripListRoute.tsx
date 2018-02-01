@@ -153,4 +153,4 @@ class TripListRoute extends React.Component<StyleProps, State> {
     }
 }
 
-export default withStyles(styles)(TripListRoute) as React.ComponentClass<Props>;
+export default withStyles(styles)<Props>(TripListRoute);

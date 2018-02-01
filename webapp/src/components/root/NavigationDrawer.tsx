@@ -132,4 +132,4 @@ class NavigationDrawer extends React.Component<InternalProps, State> {
     }
 }
 
-export default injectIntl(withStyles(styles)(NavigationDrawer)) as React.ComponentClass<Props>;
+export default injectIntl<Props>(withStyles(styles)(NavigationDrawer));

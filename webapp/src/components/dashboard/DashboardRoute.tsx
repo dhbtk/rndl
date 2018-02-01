@@ -43,4 +43,4 @@ export class DashboardRoute extends React.Component<StyleProps> {
     }
 }
 
-export default withStyles(styles)(DashboardRoute) as React.ComponentClass<Props>;
+export default withStyles(styles)<Props>(DashboardRoute);

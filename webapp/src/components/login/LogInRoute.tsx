@@ -143,4 +143,4 @@ class LogInRoute extends React.Component<InternalProps, State> {
     }
 }
 
-export default injectIntl(withStyles(loginStyle)(LogInRoute)) as React.ComponentClass<Props>;
+export default injectIntl<Props>(withStyles(loginStyle)(LogInRoute));

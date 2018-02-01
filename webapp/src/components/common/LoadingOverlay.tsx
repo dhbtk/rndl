@@ -25,4 +25,4 @@ function LoadingOverlay({ classes }: WithStyles<'overlay'>) {
     );
 }
 
-export default withStyles(styles)(LoadingOverlay) as React.StatelessComponent<{}>;
+export default withStyles(styles)<{}>(LoadingOverlay);
