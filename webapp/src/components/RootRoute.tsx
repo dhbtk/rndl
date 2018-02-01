@@ -8,6 +8,7 @@ import NavigationDrawer from './root/NavigationDrawer';
 import DashboardRoute from './dashboard/DashboardRoute';
 import User from '../api/entities/user/User';
 import TripListRoute from './trips/TripListRoute';
+import VehicleDetailRoute from './vehicles/detail/VehicleDetailRoute';
 
 export interface Props {
     loginState: LoginState;
@@ -39,10 +40,12 @@ const RootRoute = ({ loginState, classes }: StyleProps) => {
                     <Route exact={true} path="/trips" component={TripListRoute}/>
                     <Route exact={true} path="/trips/:year/:month" component={TripListRoute}/>
                     <Route exact={true} path="/trips/:year/:month/:vehicleId" component={TripListRoute}/>
+
+                    <Route exact={true} path="/vehicles/:id" component={VehicleDetailRoute} />
                 </div>
             </div>
         );
     }
 };
 
-export default withStyles(styles)(RootRoute) as React.StatelessComponent<Props>;
+export default withStyles(styles)<Props>(RootRoute);
