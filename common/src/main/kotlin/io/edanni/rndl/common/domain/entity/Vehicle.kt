@@ -11,9 +11,7 @@ data class Vehicle(
         val name: String? = null,
         val torqueId: String? = null,
         val licensePlate: String? = null,
-        val gearRatios: Array<BigDecimal> = emptyArray(),
-        val finalDrive: BigDecimal? = null,
-        val tireDiameter: BigDecimal? = null,
+        val gearReferenceSpeeds: Array<BigDecimal> = emptyArray(),
         val userGroupId: Long? = null,
         // Entity
         val latestEntry: Entry? = null,

@@ -6,9 +6,7 @@ export default interface Vehicle extends Entity {
     name?: string;
     torqueId?: string;
     licensePlate?: string;
-    gearRatios?: number[];
-    finalDrive?: number;
-    tireDiameter?: number;
+    gearReferenceSpeeds?: number[];
     userGroupId?: number;
     latestEntry?: Entry;
     userGroup?: UserGroup;
